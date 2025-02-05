@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEUROVEST AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #000000;
+            color: #ffffff;
+            text-align: center;
+            overflow: hidden;
+        }
+        section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .cta-button {
+            width: 80px;
+            height: 80px;
+            display: inline-block;
+            border-radius: 50%;
+            border: none;
+            background: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gKgSUNDX1BST0ZJTEUAAQEAAAKQbGNtcwQwAABtbnRyUkdCI') no-repeat center;
+            background-size: cover;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="neuronCanvas"></canvas>
+    <section>
+        <a href="#" class="cta-button"></a>
+    </section>
+    <script>
+        const canvas = document.getElementById('neuronCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let neurons = [];
+        let connections = [];
+
+        function createNeurons(num) {
+            for (let i = 0; i < num; i++) {
+                neurons.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 5 + 3,
+                    dx: Math.random() * 1.5 - 0.75,
+                    dy: Math.random() * 1.5 - 0.75
+                });
+            }
+        }
+
+        function connectNeurons() {
+            connections = [];
+            for (let i = 0; i < neurons.length; i++) {
+                for (let j = i + 1; j < neurons.length; j++) {
+                    let dx = neurons[i].x - neurons[j].x;
+                    let dy = neurons[i].y - neurons[j].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 150) {
+                        connections.push({ n1: neurons[i], n2: neurons[j] });
+                    }
+                }
+            }
+        }
+
+        function drawNeurons() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#6b1ff5';
+            ctx.strokeStyle = 'rgba(31, 111, 235, 0.5)';
+            ctx.lineWidth = 1.5;
+
+            neurons.forEach(neuron => {
+                ctx.beginPath();
+                ctx.arc(neuron.x, neuron.y, neuron.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            connections.forEach(connection => {
+                ctx.beginPath();
+                ctx.moveTo(connection.n1.x, connection.n1.y);
+                ctx.lineTo(connection.n2.x, connection.n2.y);
+                ctx.stroke();
+            });
+        }
+
+        function updateNeurons() {
+            neurons.forEach(neuron => {
+                neuron.x += neuron.dx;
+                neuron.y += neuron.dy;
+                if (neuron.x < 0 || neuron.x > canvas.width) neuron.dx *= -1;
+                if (neuron.y < 0 || neuron.y > canvas.height) neuron.dy *= -1;
+            });
+        }
+
+        function animate() {
+            updateNeurons();
+            connectNeurons();
+            drawNeurons();
+            requestAnimationFrame(animate);
+        }
+
+        createNeurons(50);
+        animate();
+    </script>
+</body>
+</html>
